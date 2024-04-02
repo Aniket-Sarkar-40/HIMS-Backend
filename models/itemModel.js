@@ -33,7 +33,7 @@ const itemSchema = new mongoose.Schema(
     unit: {
       type: mongoose.Schema.ObjectId,
       ref: "unit",
-      required: true,
+      // required: true,
     },
     isBatchNoRequired: {
       type: Boolean,
