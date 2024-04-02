@@ -19,9 +19,13 @@ app.use(express.json());
 app.use(cookieParser());
 
 //*Routes import
-// const eventRoute = require("./routes/eventRoute");
+const item = require("./routes/itemRoute");
+const category = require("./routes/categoryRoute");
+const unit = require("./routes/unitRoute");
 
-// app.use("/api/v1", eventRoute);
+app.use("/api/v1/item", item);
+app.use("/api/v1/category", category);
+app.use("/api/v1/unit", unit);
 
 //*Middleware for error
 app.use(errMiddleware);

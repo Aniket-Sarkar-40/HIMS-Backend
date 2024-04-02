@@ -5,6 +5,7 @@ const itemSchema = new mongoose.Schema(
     id: {
       type: Number,
       required: true,
+      unique: true,
     },
     createdDate: {
       type: Date,
