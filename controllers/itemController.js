@@ -37,7 +37,13 @@ exports.getAllItem = catchAsyncError(async (req, res) => {
     responseCode: "F0006",
     apiResponseMessage: "Data Found",
     portalResponseMessage: "Data Found",
-    response: Items,
+    response: {
+      currentPageNumber: 1,
+      lastPageNumber: 2,
+      pageSize: 10,
+      totalRecords: Items.length,
+      data: Items,
+    },
     status: "OK",
   });
 });
