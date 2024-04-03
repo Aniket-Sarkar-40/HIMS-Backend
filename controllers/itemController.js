@@ -6,8 +6,8 @@ const Unit = require("../models/unit");
 
 exports.createItem = catchAsyncError(async (req, res, next) => {
   const { itemCategory, unit } = req.body;
-  const category = await Category.findOne({ id: itemCategory });
-  const unitDetails = await Unit.findOne({ id: unit });
+  const category = await Category.findOne({ id: parseInt(itemCategory) });
+  const unitDetails = await Unit.findOne({ id: parseInt(unit) });
   req.body.itemCategory = category._id;
   req.body.unit = unitDetails._id;
 
