@@ -14,9 +14,14 @@ exports.createItem = catchAsyncError(async (req, res, next) => {
   const item = await Item.create(req.body);
 
   res.status(200).json({
-    success: true,
-    Item: item,
-    message: "Item created successfully.",
+    result: "S",
+    responseCode: "F0007",
+    apiResponseMessage: "Data Saved Successfully",
+    portalResponseMessage: "Data Saved Successfully",
+    response: {
+      items: item,
+    },
+    status: "OK",
   });
 });
 
