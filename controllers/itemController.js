@@ -33,8 +33,12 @@ exports.getAllItem = catchAsyncError(async (req, res) => {
     });
 
   res.status(200).json({
-    success: true,
-    Items: Items,
+    result: "S",
+    responseCode: "F0006",
+    apiResponseMessage: "Data Found",
+    portalResponseMessage: "Data Found",
+    response: Items,
+    status: "OK",
   });
 });
 
