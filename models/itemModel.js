@@ -2,46 +2,68 @@ const mongoose = require("mongoose");
 
 const itemSchema = new mongoose.Schema(
   {
-    id: Number,
-    createdDate: Date,
+    id: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
+    createdDate: {
+      type: Date,
+      default: Date.now(),
+    },
     createdBy: String,
-    lastUpdatedDate: Date,
+    lastUpdatedDate: {
+      type: Date,
+      default: Date.now(),
+    },
     lastUpdatedBy: String,
-    itemName: String,
-    itemCode: String,
+    itemName: {
+      type: String,
+      required: true,
+    },
+    itemCode: {
+      type: String,
+      required: true,
+    },
     itemCategory: {
-      id: Number,
-      createdDate: String,
-      createdBy: String,
-      lastUpdatedDate: String,
-      lastUpdatedBy: String,
-      itemCategory: String,
-      description: String,
-      isLocked: Boolean,
-      isDeleted: Boolean,
+      type: mongoose.Schema.ObjectId,
+      ref: "itemCategory",
+      required: true,
     },
     unit: {
-      id: Number,
-      createdDate: String,
-      createdBy: String,
-      lastUpdatedDate: String,
-      lastUpdatedBy: String,
-      unitName: String,
-      unitCode: String,
-      defaultValue: String,
-      isDeleted: Boolean,
+      type: mongoose.Schema.ObjectId,
+      ref: "unit",
+      // required: true,
     },
-    isBatchNoRequired: Boolean,
-    isExpiryDateRequired: Boolean,
-    isReturnable: Boolean,
+    isBatchNoRequired: {
+      type: Boolean,
+      default: false,
+    },
+    isExpiryDateRequired: {
+      type: Boolean,
+      default: false,
+    },
+    isReturnable: {
+      type: Boolean,
+      default: false,
+    },
     description: String,
     quantity: {
       type: Number,
       default: 0,
     },
-    price: Number,
-    sellingPrice: Number,
-    isLocked: Boolean,
+    price: {
+      type: Number,
+      required: true,
+    },
+    sellingPrice: {
+      type: Number,
+      required: true,
+    },
+    isLocked: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     strict: false,
