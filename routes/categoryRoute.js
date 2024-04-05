@@ -6,6 +6,6 @@ const {
 const router = express.Router();
 
 router.post("/", createCategory);
-router.get("/", getAllCategory);
+router.post("/get", getAllCategory);
 
 module.exports = router;
