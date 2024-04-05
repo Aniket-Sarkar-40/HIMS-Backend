@@ -198,56 +198,59 @@ exports.getAllCategory = catchAsyncError(async (req, res) => {
 
   let queryArray = [];
 
-  // data.forEach((field) => {
-  //   queryArray.push({
-  //     $lookup: {
-  //       from: field.masterData.tableName,
-  //       localField: field.uniqueFieldName,
-  //       foreignField: field.masterData.key,
-  //       as: field.masterData.value,
-  //     },
-  //   });
-  //   queryArray.push({
-  //     $set: {
-  //       [`${field.masterData.value}`]: {
-  //         $arrayElemAt: [`$${field.masterData.value}`, 0],
-  //       },
-  //     },
-  //   });
-  // });
+  data.forEach((field) => {
+    queryArray.push({
+      $lookup: {
+        from: field.masterData.tableName,
+        localField: field.uniqueFieldName,
+        foreignField: field.masterData.key,
+        as: field.masterData.value,
+      },
+    });
+    queryArray.push({
+      $set: {
+        [`${field.masterData.value}`]: {
+          $arrayElemAt: [`$${field.masterData.value}`, 0],
+        },
+      },
+    });
+  });
 
   const shortCode = req.body.short_code;
   const collection = Short_Code_To_Collection[shortCode];
   const categoryCollection = db.collection(collection);
   const response = await categoryCollection
-    .aggregate([
-      {
-        $lookup: {
-          from: "category",
-          localField: "itemCategoryId",
-          foreignField: "_id",
-          as: "itemCategory",
-        },
-      },
-      {
-        $lookup: {
-          from: "unit",
-          localField: "unitId",
-          foreignField: "_id",
-          as: "unit",
-        },
-      },
-      {
-        $set: {
-          itemCategory: { $arrayElemAt: ["$itemCategory", 0] },
-        },
-      },
-      {
-        $set: {
-          unit: { $arrayElemAt: ["$unit", 0] },
-        },
-      },
-    ])
+    .aggregate(
+      // [
+      // {
+      //   $lookup: {
+      //     from: "category",
+      //     localField: "itemCategoryId",
+      //     foreignField: "_id",
+      //     as: "itemCategory",
+      //   },
+      // },
+      // {
+      //   $lookup: {
+      //     from: "unit",
+      //     localField: "unitId",
+      //     foreignField: "_id",
+      //     as: "unit",
+      //   },
+      // },
+      // {
+      //   $set: {
+      //     itemCategory: { $arrayElemAt: ["$itemCategory", 0] },
+      //   },
+      // },
+      // {
+      //   $set: {
+      //     unit: { $arrayElemAt: ["$unit", 0] },
+      //   },
+      // },
+      // ]
+      queryArray
+    )
     .toArray();
 
   res.status(200).json({
