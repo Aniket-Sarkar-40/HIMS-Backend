@@ -172,11 +172,13 @@ exports.dynamicCreate = catchAsyncError(async (req, res, next) => {
   const shortCode = req.body.short_code;
   const collection = Short_Code_To_Collection[shortCode];
   const categoryCollection = db.collection(collection);
-  data.forEach((doc) => {
-    req.body.data[doc.uniqueFieldName] = new ObjectId(
-      req.body.data[doc.uniqueFieldName]
-    );
-  });
+  if (shortCode === "ITM") {
+    data.forEach((doc) => {
+      req.body.data[doc.uniqueFieldName] = new ObjectId(
+        req.body.data[doc.uniqueFieldName]
+      );
+    });
+  }
   const response = await categoryCollection.insertOne(req.body.data);
 
   res.status(200).json({
