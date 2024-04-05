@@ -160,7 +160,7 @@ const configJson = {
   ],
 };
 
-exports.createCategory = catchAsyncError(async (req, res, next) => {
+exports.dynamicCreate = catchAsyncError(async (req, res, next) => {
   // const category = await Category.create(req.body);
 
   const allFields = configJson?.controls?.map((c) => {
@@ -187,7 +187,7 @@ exports.createCategory = catchAsyncError(async (req, res, next) => {
 });
 
 //*Get All Category
-exports.getAllCategory = catchAsyncError(async (req, res) => {
+exports.dynamicFetch = catchAsyncError(async (req, res, next) => {
   // const category = await Category.create(req.body);
   const allFields = configJson?.controls?.map((c) => {
     return c.fields;
@@ -197,26 +197,28 @@ exports.getAllCategory = catchAsyncError(async (req, res) => {
   const data = flatFields.filter((f) => f.type === "masterdropdown");
 
   let queryArray = [];
-
-  data.forEach((field) => {
-    queryArray.push({
-      $lookup: {
-        from: field.masterData.tableName,
-        localField: field.uniqueFieldName,
-        foreignField: field.masterData.key,
-        as: field.masterData.value,
-      },
-    });
-    queryArray.push({
-      $set: {
-        [`${field.masterData.value}`]: {
-          $arrayElemAt: [`$${field.masterData.value}`, 0],
-        },
-      },
-    });
-  });
-
   const shortCode = req.body.short_code;
+
+  if (shortCode === "ITM") {
+    data.forEach((field) => {
+      queryArray.push({
+        $lookup: {
+          from: field.masterData.tableName,
+          localField: field.uniqueFieldName,
+          foreignField: field.masterData.key,
+          as: field.masterData.value,
+        },
+      });
+      queryArray.push({
+        $set: {
+          [`${field.masterData.value}`]: {
+            $arrayElemAt: [`$${field.masterData.value}`, 0],
+          },
+        },
+      });
+    });
+  }
+
   const collection = Short_Code_To_Collection[shortCode];
   const categoryCollection = db.collection(collection);
   const response = await categoryCollection
@@ -253,8 +255,90 @@ exports.getAllCategory = catchAsyncError(async (req, res) => {
     )
     .toArray();
 
-  res.status(200).json({
-    success: true,
-    response,
+  let isError = false;
+  let id;
+  if (shortCode === "ITM") {
+    response.forEach((elem) => {
+      data.forEach((item) => {
+        if (elem[item.masterData.value] === undefined) {
+          isError = true;
+          id = item.masterData.value;
+        }
+      });
+    });
+  }
+  if (isError) {
+    return next(new ErrorHandler(`Invalid ${id} id provided`, 404));
+  } else {
+    res.status(200).json({
+      success: true,
+      response,
+    });
+  }
+});
+
+exports.dynamicFetchById = catchAsyncError(async (req, res, next) => {
+  const id = req.params.id;
+  const shortCode = req.body.short_code;
+
+  const allFields = configJson?.controls?.map((c) => {
+    return c.fields;
   });
+  const flatFields = allFields.flat(1);
+
+  const data = flatFields.filter((f) => f.type === "masterdropdown");
+
+  let queryArray = [
+    {
+      $match: {
+        _id: new ObjectId(id),
+      },
+    },
+  ];
+
+  if (shortCode === "ITM") {
+    data.forEach((field) => {
+      queryArray.push({
+        $lookup: {
+          from: field.masterData.tableName,
+          localField: field.uniqueFieldName,
+          foreignField: field.masterData.key,
+          as: field.masterData.value,
+        },
+      });
+      queryArray.push({
+        $set: {
+          [`${field.masterData.value}`]: {
+            $arrayElemAt: [`$${field.masterData.value}`, 0],
+          },
+        },
+      });
+    });
+  }
+
+  const collection = Short_Code_To_Collection[shortCode];
+  const categoryCollection = db.collection(collection);
+
+  const response = await categoryCollection.aggregate(queryArray).toArray();
+
+  let isError = false;
+  let Id = id;
+  if (shortCode === "ITM") {
+    response.forEach((elem) => {
+      data.forEach((item) => {
+        if (elem[item.masterData.value] === undefined) {
+          isError = true;
+          Id = item.masterData.value;
+        }
+      });
+    });
+  }
+  if (isError || response.length === 0) {
+    return next(new ErrorHandler(`Invalid ${Id} id provided`, 404));
+  } else {
+    res.status(200).json({
+      success: true,
+      response: response[0],
+    });
+  }
 });

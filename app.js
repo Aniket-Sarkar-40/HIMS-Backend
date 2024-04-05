@@ -20,11 +20,11 @@ app.use(cookieParser());
 
 //*Routes import
 const item = require("./routes/itemRoute");
-const category = require("./routes/categoryRoute");
+const dynamic = require("./routes/dynamicRoute");
 const unit = require("./routes/unitRoute");
 
 app.use("/api/v1/item", item);
-app.use("/api/v1/category", category);
+app.use("/api/v1/dynamic", dynamic);
 app.use("/api/v1/unit", unit);
 
 //*Middleware for error
